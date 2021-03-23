@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Radiation_Jam_Deadwingtree.ogg-b30636b51de7dc93012c3944d79612c0.oggstr"
+
+[deps]
+
+source_file="res://audio/music/Radiation_Jam_Deadwingtree.ogg"
+dest_files=[ "res://.import/Radiation_Jam_Deadwingtree.ogg-b30636b51de7dc93012c3944d79612c0.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

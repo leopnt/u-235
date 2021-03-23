@@ -1,0 +1,192 @@
+[gd_scene load_steps=17 format=2]
+
+[ext_resource path="res://src/main.gd" type="Script" id=1]
+[ext_resource path="res://scenes/Objects/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/Objects/Spawner.tscn" type="PackedScene" id=3]
+[ext_resource path="res://src/objects/camera2D.gd" type="Script" id=4]
+[ext_resource path="res://scenes/UI.tscn" type="PackedScene" id=5]
+[ext_resource path="res://shader/GodotRetro/Other/Images/white.png" type="Texture" id=6]
+[ext_resource path="res://shader/GodotRetro/Screen Shaders/TV.shader" type="Shader" id=7]
+[ext_resource path="res://shader/GodotRetro/Screen Shaders/Aditional Shaders/Grain.shader" type="Shader" id=8]
+[ext_resource path="res://shader/GodotRetro/Other/Images/CRT Frame.png" type="Texture" id=9]
+[ext_resource path="res://scenes/Audio.tscn" type="PackedScene" id=10]
+
+[sub_resource type="PhysicsMaterial" id=1]
+friction = 0.0
+bounce = 1000.0
+
+[sub_resource type="Animation" id=2]
+length = 60.0
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 30, 50.4, 60 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 0, 0.12549, 0.109804, 1 ), Color( 0, 0.12549, 0.0588235, 1 ), Color( 0, 0.0431373, 0.12549, 1 ), Color( 0, 0.12549, 0.109804, 1 ) ]
+}
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = ExtResource( 8 )
+shader_param/screen_size = Vector2( 600, 600 )
+shader_param/colored = false
+shader_param/color_amount = 0.6
+shader_param/grain_amount = 0.035
+shader_param/grain_size = 2.014
+shader_param/lum_amount = 1.3
+
+[sub_resource type="Shader" id=4]
+code = "//CRT SHADER ORIGINALY CREADED BY \"hiulit\" FROM GITHUB 
+//MODIFYED TO LENS DISTORTION SHADER BY AHOPNESS (@ahopness)
+//
+//GITHUB LINK : https://github.com/hiulit/Godot-3-2D-CRT-Shader
+
+shader_type canvas_item;
+
+uniform bool show_curvature = true;
+uniform float curvature_x_amount : hint_range(2.5, 15.0, 0.01) = float(6.0); 
+uniform float curvature_y_amount : hint_range(2.5, 15.0, 0.01) = float(4.0);
+
+vec2 uv_curve(vec2 uv) {
+	if (show_curvature) {
+		uv = uv * 2.0 - 1.0;
+		vec2 offset = abs(uv.yx) / vec2(curvature_x_amount, curvature_y_amount);
+		uv = uv + uv * offset * offset;
+		uv = uv * 0.5 + 0.5;
+	}
+
+	return uv;
+}
+
+void fragment() {
+	vec2 screen_uv = uv_curve(SCREEN_UV);
+	vec3 color = texture(SCREEN_TEXTURE, screen_uv).rgb;
+	
+	COLOR = vec4(color, 1.0);
+}"
+
+[sub_resource type="ShaderMaterial" id=5]
+shader = SubResource( 4 )
+shader_param/show_curvature = true
+shader_param/curvature_x_amount = 6.0
+shader_param/curvature_y_amount = 4.0
+
+[sub_resource type="ShaderMaterial" id=6]
+shader = ExtResource( 7 )
+shader_param/vertJerkOpt = 0.069
+shader_param/vertMovementOpt = 0.0
+shader_param/bottomStaticOpt = 0.138
+shader_param/scalinesOpt = 0.034
+shader_param/rgbOffsetOpt = 0.218
+shader_param/horzFuzzOpt = 0.368
+
+[node name="Main" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="Audio" parent="." instance=ExtResource( 10 )]
+
+[node name="UI" parent="." instance=ExtResource( 5 )]
+pause_mode = 2
+offset = Vector2( -300, -300 )
+transform = Transform2D( 1, 0, 0, 1, -300, -300 )
+follow_viewport_enable = true
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+position = Vector2( 0.0379028, -1.04999 )
+collision_layer = 3
+collision_mask = 3
+
+[node name="Boundaries" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+physics_material_override = SubResource( 1 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Boundaries"]
+build_mode = 1
+polygon = PoolVector2Array( -303.98, -302.09, 298.102, -302.09, 301.466, 303.355, -297.253, 299.992 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+script = ExtResource( 4 )
+
+[node name="ShakeTimer" type="Timer" parent="Camera2D"]
+one_shot = true
+
+[node name="Spawner" parent="." instance=ExtResource( 3 )]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="background" type="ColorRect" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0.12549, 0.109804, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer/background"]
+anims/color_modulator = SubResource( 2 )
+
+[node name="ShaderLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="TextureRect" type="TextureRect" parent="ShaderLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 9 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackBufferCopy2" type="BackBufferCopy" parent="ShaderLayer"]
+copy_mode = 2
+rect = Rect2( 0, 0, 600, 600 )
+
+[node name="grain" type="TextureRect" parent="ShaderLayer/BackBufferCopy2"]
+material = SubResource( 3 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 6 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackBufferCopy3" type="BackBufferCopy" parent="ShaderLayer"]
+copy_mode = 2
+rect = Rect2( 0, 0, 600, 600 )
+
+[node name="lensdistor" type="TextureRect" parent="ShaderLayer/BackBufferCopy3"]
+material = SubResource( 5 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 6 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackBufferCopy" type="BackBufferCopy" parent="ShaderLayer"]
+copy_mode = 2
+rect = Rect2( 0, 0, 600, 600 )
+
+[node name="tv" type="TextureRect" parent="ShaderLayer/BackBufferCopy"]
+material = SubResource( 6 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 6 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="hit" from="Player" to="Camera2D" method="_on_Player_hit"]
+[connection signal="increase_score" from="Player" to="UI" method="_on_Player_increase_score"]
+[connection signal="player_dead" from="Player" to="UI" method="_on_Player_player_dead"]
+[connection signal="player_dead" from="Player" to="Camera2D" method="_on_Player_player_dead"]
+[connection signal="timeout" from="Camera2D/ShakeTimer" to="Camera2D" method="_on_ShakeTimer_timeout"]

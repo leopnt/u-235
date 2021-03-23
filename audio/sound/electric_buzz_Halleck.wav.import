@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/electric_buzz_Halleck.wav-91de615996d0f55f91e67e0431a64c0d.sample"
+
+[deps]
+
+source_file="res://audio/sound/electric_buzz_Halleck.wav"
+dest_files=[ "res://.import/electric_buzz_Halleck.wav-91de615996d0f55f91e67e0431a64c0d.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

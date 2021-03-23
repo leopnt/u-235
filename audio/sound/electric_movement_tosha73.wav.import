@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/electric_movement_tosha73.wav-fad3c1a02c7caa9686ca6323e0c361c4.sample"
+
+[deps]
+
+source_file="res://audio/sound/electric_movement_tosha73.wav"
+dest_files=[ "res://.import/electric_movement_tosha73.wav-fad3c1a02c7caa9686ca6323e0c361c4.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=true
+compress/mode=0
